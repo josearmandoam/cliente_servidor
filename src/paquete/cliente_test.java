@@ -7,6 +7,7 @@
 package paquete;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,7 +36,7 @@ public class cliente_test {
     //PETICIONES
     private final String GET_DATA_AVAILABLE = "0001";
     private final String END_CONNECTION = "0000";
-    
+    private final String DIE_SERVER = "111111111111111111111";
     private final String SAVE_FILES_PATH = "img/";
     
     
@@ -47,6 +48,7 @@ public class cliente_test {
     private Vector<MFile> files_available;
     private String response;
     private MFile mFile;
+    private byte[] buffer; 
     //Gestion Imagen
     ObjectInputStream ois;
     FileOutputStream fos;
@@ -92,13 +94,12 @@ public class cliente_test {
             writeMessage(OK);
         }
         
-        if(files_available.size() == data_size)
-            writeMessage(OK);
+        writeMessage(OK);
         
-        System.out.println("Cliente: \nArchivos disponibles:");
-        for(int i=0;i<files_available.size();i++){
-            System.out.println(files_available.get(i));
-        }
+//        System.out.println("Cliente: \nArchivos disponibles:");
+//        for(int i=0;i<files_available.size();i++){
+//            System.out.println(files_available.get(i));
+//        }
     }
 
     private void writeMessage(String message){
@@ -106,7 +107,7 @@ public class cliente_test {
             outWriter = new PrintWriter(clientSocket.getOutputStream(),true);
             outWriter.println(message);
            
-            System.out.println("Client write: "+message);
+//            System.out.println("Client write: "+message);
             //outWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
@@ -118,7 +119,7 @@ public class cliente_test {
         try {
             inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             response = inReader.readLine();
-            System.out.println("Client reads: "+response);
+//            System.out.println("Client reads: "+response);
            
             //inReader.close();
         } catch (IOException ex) {
@@ -128,17 +129,33 @@ public class cliente_test {
     }
     
     private void takeFile(String name){
-        try {
-            ois = new ObjectInputStream(clientSocket.getInputStream());
-            byte[] buffer = (byte[]) ois.readObject();
-            
-            fos = new FileOutputStream(SAVE_FILES_PATH + name);
-            fos.write(buffer);
-        } catch (IOException ex) {
-            Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Thread read = new Thread(){
+          public void run(){
+              try {
+                  ois = new ObjectInputStream(clientSocket.getInputStream());
+                  buffer= (byte[]) ois.readObject();
+              } catch (IOException ex) {
+                  Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
+              } catch (ClassNotFoundException ex) {
+                  Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
+              }
+          }  
+        };
+        read.start();
+        while(read.isAlive()){}
+        Thread write = new Thread(){
+            public void run(){
+                try {
+                    fos = new FileOutputStream(SAVE_FILES_PATH + name);
+                    fos.write(buffer);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        write.start();
     }
     
     private void endConnection() {

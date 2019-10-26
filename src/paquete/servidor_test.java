@@ -48,6 +48,7 @@ public class servidor_test {
     private String peticion;
     private Vector<MFile> files_available;
     private MFile mFile;
+    byte[] buffer;
     
     //Gstion de Imagen
     FileInputStream fis;
@@ -119,9 +120,9 @@ public class servidor_test {
         if(mFile != null){
             proccessFile(mFile.getPath());
             if(!clientReceivedMessage())
-                System.out.println("ERROR AL DESCARGAR LA IMAGEN");
+                System.out.println("ERROR AL ENVIAR EL ARCHIVO");
             else{
-                System.out.println("IMAGEN DESCARGADA CORRECTAMENTE");
+                System.out.println("ARCHIVO ENVIADO CORRECTAMENTE");
                 writeMessage(SERVER_LISTENING);
             }
         }
@@ -150,7 +151,7 @@ public class servidor_test {
             outWriter = new PrintWriter(clientSocket.getOutputStream(), true);
             outWriter.println(message);
             
-            System.out.println("Client write: "+message);
+//            System.out.println("Client write: "+message);
             //outWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
@@ -163,7 +164,7 @@ public class servidor_test {
             inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             response = inReader.readLine();
             
-            System.out.println("Client reads: "+response);
+//            System.out.println("Client reads: "+response);
             //inReader.close();
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
@@ -176,20 +177,39 @@ public class servidor_test {
     }
 
     private void proccessFile(String path){
-        try {
-            fis = new FileInputStream(path);
-            byte[] buffer = new byte[fis.available()];
-            fis.read(buffer);
-            
-            oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            oos.writeObject(buffer);
-            
+        
+            Thread read = new Thread(){
+                public void run(){
+                    try {
+                        fis = new FileInputStream(path);
+                        buffer = new byte[fis.available()];
+                        fis.read(buffer);
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            read.start();
+            while(read.isAlive()){};
+            Thread write = new Thread(){
+                public void run(){
+                    try {
+                        oos = new ObjectOutputStream(clientSocket.getOutputStream());
+                        oos.writeObject(buffer);
+                        
+//                        System.out.println(oos)
+                    } catch (IOException ex) {
+                        Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            write.start();
+            while(write.isAlive()){
+                System.out.println("Enviando archivo...");
+            }
             //oos.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     private void readFilesAvailable(){
