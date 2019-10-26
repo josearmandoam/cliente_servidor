@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 //AÑADIDO POR ARMANDO
-package client.server;
+package paquete;
 
 /**
  *
@@ -17,17 +17,18 @@ public class main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        
         Thread hilo = new Thread(){
           @Override
           public void run(){
               servidor_test server = new servidor_test();
-              server.iniciarServidor();
+              server.startServer();
           }
         };
         hilo.start();
         
         cliente_test cliente = new cliente_test();
-        cliente.iniciarCliente();
+        cliente.startClient();
     }
     
 }
