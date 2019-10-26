@@ -6,6 +6,7 @@
 package client.server;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,13 +30,13 @@ public class servidor_test {
     private final String NOT_OK = "100";
     
     private final String IMAGES_DATA = "002";
-    private final String IMAGES_SIZE = "020";
+    private final String DATA_SIZE = "020";
     private final String END_DATA =  "200";
-    private final String DOWNLOAD_IMAGE = "222";
+    private final String DOWNLOAD_FILE = "222";
     
     //PETICIONES
-    private final String GET_IMAGES_URLS = "0001";
-    private final String END_CONECTION = "0000";
+    private final String GET_DATA_AVAILABLE = "0001";
+    private final String END_CONNECTION = "0000";
     
     private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -43,31 +44,18 @@ public class servidor_test {
     private BufferedReader inReader;
     private int port = 29292;
     private String peticion;
-    private Vector<String> images_url;
-    private Vector<String> v_path;
+    private Vector<MFile> files_available;
+    private MFile mFile;
     
     //Gstion de Imagen
     FileInputStream fis;
     ObjectOutputStream oos;
     
     public servidor_test(){
-        images_url = new Vector();
-        images_url.add("https://i.imgur.com/49hyqOo.jpg");
-        images_url.add("https://i.imgur.com/YCQQToE.jpg");
-        images_url.add("https://i.imgur.com/Ccg3obV.jpg");
-        
-        v_path = new Vector();
-        v_path.add("img/esfera.jpg");
-        v_path.add("img/cubo.jpg");
-        v_path.add("img/tetraedro.jpg");
-        v_path.add("img/pdf-test.pdf");
-        v_path.add("img/sample-audio.mp3");
-        v_path.add("img/test-tgz.tgz");
-        v_path.add("img/CentOS-7-x86_64-Minimal-1611.iso");
-        v_path.add("img/ubuntu-16.04.5-server-amd64.iso");
+        readFilesAvailable();
     }
     
-    public void iniciarServidor(){
+    public void startServer(){
         try {
             serverSocket = new ServerSocket(port);
             do{
@@ -78,83 +66,77 @@ public class servidor_test {
                     //inReader.close();
                     if(peticion != "-1")
                         switch (peticion) {
-                            case GET_IMAGES_URLS:
-                                //El cliente solicita las imagenes
-                                if(!enviarImagenes())
-                                    System.out.println("ERROR AL ENVIAR LAS IMAGENES");
-                                else{
-                                    //outWriter.close();
-                                    //inReader.close();
-                                    System.out.println("IMAGENES ENVIADAS CORRECTAMENTE");
-                                    writeMessage(SERVER_LISTENING);
-                                }
+                            case GET_DATA_AVAILABLE:
+                                //El cliente solicita los archivos del servidor
+                                sendFilesAvailable();
                                 break;
-                            case DOWNLOAD_IMAGE:
-                                //El cliente solicita descargar una imagen
-                                if(!images_url.isEmpty()){
-                                    writeMessage(OK);
-                                    if(readMessage().equals(IMAGES_DATA)){
-                                        writeMessage(OK);
-                                        int num_imagen = Integer.parseInt(readMessage());
-                                        String path = v_path.get(num_imagen);
-                                        if(path != null){
-                                            writeMessage(OK);
-                                            sendImage(path);
-                                            if(!clientReceivedMessage())
-                                                System.out.println("ERROR AL DESCARGAR LA IMAGEN");
-                                            else{
-                                                System.out.println("IMAGEN DESCARGADA CORRECTAMENTE");
-                                                writeMessage(SERVER_LISTENING);
-                                            }
-                                                
-                                        }
-                                    }
-                                }
+                            case DOWNLOAD_FILE:
+                                //Se envia el fichero que se solicita
+                                sendFile();
                                 break;
 
                             //case 333:
                                 //datos de la imagen que se va a descargar
                             //    break;
 
-                            case END_CONECTION:
+                            case END_CONNECTION:
                                 //El cliente solicita desconectarse del servidor
-                                inReader.close();
-                                outWriter.close();
-                                oos.close();
-                                clientSocket.close();
-                                clientSocket = null;
+                                endClientConnection();
                                 break;
                             default:
-                                throw new AssertionError();
                         }
                     
-                }while(clientSocket!=null);
+                }while(clientSocket != null);
             }while(true);
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private boolean enviarImagenes(){
-        boolean result = false;
-        writeMessage(CLIENT_OPERATIVE);
-        if(clientReceivedMessage()){
-            writeMessage(IMAGES_DATA);
-            if(clientReceivedMessage()){
-                writeMessage(IMAGES_SIZE);
-                if(clientReceivedMessage())
-                    writeMessage(Integer.toString(images_url.size()));
-                    for(int i=0;i<images_url.size();i++){
-                        writeMessage(images_url.get(i));
-                        clientReceivedMessage();
-                    }
-                if(clientReceivedMessage())
-                    result = true;
-            }
-        }else{
-            System.out.println("CLIENTE NO OPERATIVO");
+
+    private void endClientConnection() {
+        try{
+            if(inReader!=null)
+                inReader.close();
+            if(outWriter!=null)
+                outWriter.close();
+            if(oos!=null)
+                oos.close();
+            if(clientSocket!=null)
+                clientSocket.close();
+            clientSocket = null;
+        }catch(IOException e){}
+    }
+
+    private void sendFile() {
+        //El cliente solicita descargar una imagen
+        String id_file = readMessage();
+        for(MFile file:files_available){
+            if(file.getId().equals(id_file))
+                mFile = file;
         }
-        return result;
+        if(mFile != null){
+            proccessFile(mFile.getPath());
+            if(!clientReceivedMessage())
+                System.out.println("ERROR AL DESCARGAR LA IMAGEN");
+            else{
+                System.out.println("IMAGEN DESCARGADA CORRECTAMENTE");
+                writeMessage(SERVER_LISTENING);
+            }
+        }
+    }
+    
+    private void sendFilesAvailable(){
+        writeMessage(Integer.toString(files_available.size()));
+        for(int i=0;i<files_available.size();i++){
+            writeMessage(files_available.get(i).getName());
+            clientReceivedMessage();
+            writeMessage(files_available.get(i).getId());
+            clientReceivedMessage();
+        }
+        if(clientReceivedMessage())
+            System.out.println("Server: Archivos enviados correctamente");
+        else
+            System.out.println("Server: Error al enviar los archivos disponibles");
     }
     
     private void writeMessage(String message){
@@ -183,7 +165,7 @@ public class servidor_test {
         return (readMessage().equals(OK));
     }
 
-    private void sendImage(String path){
+    private void proccessFile(String path){
         try {
             fis = new FileInputStream(path);
             byte[] buffer = new byte[fis.available()];
@@ -199,6 +181,16 @@ public class servidor_test {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    void readFilesAvailable(){
+        File carpeta = new File("data/");
+        files_available = new Vector();
+        for(File fichero : carpeta.listFiles()){
+            mFile = new MFile(fichero.getAbsolutePath(),fichero.getName());
+            files_available.add(mFile);
+        }
+    }
+    
 }
 
 

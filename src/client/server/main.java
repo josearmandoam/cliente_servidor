@@ -21,13 +21,13 @@ public class main {
           @Override
           public void run(){
               servidor_test server = new servidor_test();
-              server.iniciarServidor();
+              server.startServer();
           }
         };
         hilo.start();
         
         cliente_test cliente = new cliente_test();
-        cliente.iniciarCliente();
+        cliente.startClient();
     }
     
 }

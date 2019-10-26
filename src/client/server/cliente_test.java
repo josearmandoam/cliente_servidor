@@ -28,13 +28,15 @@ public class cliente_test {
     private final String NOT_OK = "100";
     
     private final String IMAGES_DATA = "002";
-    private final String IMAGES_SIZE = "020";
+    private final String DATA_SIZE = "020";
     private final String END_DATA =  "200";
-    private final String DOWNLOAD_IMAGE = "222";
+    private final String DOWNLOAD_FILE = "222";
     
     //PETICIONES
-    private final String GET_IMAGES_URLS = "0001";
-    private final String END_CONECTION = "0000";
+    private final String GET_DATA_AVAILABLE = "0001";
+    private final String END_CONNECTION = "0000";
+    
+    private final String SAVE_FILES_PATH = "img/";
     
     
     private Socket clientSocket;
@@ -42,66 +44,56 @@ public class cliente_test {
     private String host = "localhost";
     private BufferedReader inReader;
     private PrintWriter outWriter;
-    private Vector<String> images_url;
+    private Vector<MFile> files_available;
     private String response;
-    
+    private MFile mFile;
     //Gestion Imagen
     ObjectInputStream ois;
     FileOutputStream fos;
     
     public cliente_test(){
-        images_url = new Vector();
+        files_available = new Vector();
     }
     
-    public void iniciarCliente(){
+    public void startClient(){
         try {
             clientSocket = new Socket(host, port);
-            writeMessage(GET_IMAGES_URLS);
-            //while(readMessage() != CLIENT_OPERATIVE){}
-            clientOperative();
-            
-            if(readMessage().equals(IMAGES_DATA)){
-                messageReceived();
-                if(readMessage().equals(IMAGES_SIZE)){
-                    messageReceived();
-                    int size = Integer.parseInt(readMessage());
-                    for(int i=0;i<size;i++){
-                        response  = readMessage();
-                        messageReceived();
-                        images_url.add(response);
-                    }
-                }
-                    
-            }
-            messageReceived();
-            System.out.println("INFO RECIBIDA:");
-            for(int i=0;i<images_url.size();i++){
-                System.out.println(images_url.get(i));
-            }
-            
-            //SOLICITAR DESCARGAR UN IMAGEN
-            if(isServerListening()){
-                writeMessage(DOWNLOAD_IMAGE);
-                if(serverAgree()){
-                    writeMessage(IMAGES_DATA);
-                    serverAgree();
-                    writeMessage("7");
-                    serverAgree();
-                    takeImage();
-                    messageReceived();
-                }
-            }
-            
-            if(isServerListening()){
-                writeMessage(END_CONECTION);
-                outWriter.close();
-                inReader.close();
-                ois.close();
-                fos.close();
-                clientSocket.close();
-            }
+            getFilesAvailable();
+            getFile(1);
+            endConnection();
         } catch (IOException ex) {
             Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void getFile(int objectSelected) {
+        //SOLICITAR DESCARGAR UN IMAGEN
+        writeMessage(DOWNLOAD_FILE);
+        writeMessage(files_available.get(objectSelected).getId());
+        takeFile(files_available.get(objectSelected).getName());
+        writeMessage(OK);
+        writeMessage(END_CONNECTION);
+    }
+
+    private void getFilesAvailable(){
+        writeMessage(GET_DATA_AVAILABLE);
+        int data_size = Integer.parseInt(readMessage());
+        String name,id;
+        for(int i=0;i<data_size;i++){
+            name = readMessage();
+            writeMessage(OK);
+            id = readMessage();
+            mFile = new MFile("unknow",name, id);
+            files_available.add(mFile);
+            writeMessage(OK);
+        }
+        
+        if(files_available.size() == data_size)
+            writeMessage(OK);
+        
+        System.out.println("Cliente: \nArchivos disponibles:");
+        for(int i=0;i<files_available.size();i++){
+            System.out.println(files_available.get(i));
         }
     }
 
@@ -127,34 +119,32 @@ public class cliente_test {
         return response;
     }
     
-    private void messageReceived(){
-        writeMessage(OK);
-    }
-    
-    private boolean serverAgree(){
-        return (readMessage().equals(OK));
-    }
-    
-    private void clientOperative(){
-        if(readMessage().equals(CLIENT_OPERATIVE))
-            writeMessage(OK);
-    }
-    
-    private void takeImage(){
+    private void takeFile(String name){
         try {
             ois = new ObjectInputStream(clientSocket.getInputStream());
             byte[] buffer = (byte[]) ois.readObject();
             
-            fos = new FileOutputStream("img/ubuntu-16.04.5-server-amd64-download.iso");
+            fos = new FileOutputStream(SAVE_FILES_PATH + name);
             fos.write(buffer);
-            //fos.close();
         } catch (IOException ex) {
             Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private boolean isServerListening(){
-        return (readMessage().equals(SERVER_LISTENING));
+    
+    private void endConnection() {
+        writeMessage(END_CONNECTION);
+        try{
+            if(inReader!=null)
+                inReader.close();
+            if(outWriter!=null)
+                outWriter.close();
+            if(ois!=null)
+                ois.close();
+            if(clientSocket!=null)
+                clientSocket.close();
+        }catch(IOException e){}
+        clientSocket = null;
     }
 }
