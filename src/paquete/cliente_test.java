@@ -48,6 +48,8 @@ public class cliente_test {
     private String response;
     private MFile mFile;
     private byte[] buffer; 
+    private long fileSize;
+    
     //Gestion Imagen
     ObjectInputStream ois;
     FileOutputStream fos;
@@ -61,9 +63,9 @@ public class cliente_test {
             clientSocket = new Socket(host, port);
             inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //la linea de creacion del buffer la he puesto aqui para que no se destruya ningun mensaje
 
-//            getFilesAvailable();
-//            getFile(1);
-//            endConnection();
+            getFilesAvailable();
+            getFile(1);
+            endConnection();
         } catch (IOException ex) {
             Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -80,16 +82,15 @@ public class cliente_test {
     protected void getFilesAvailable(){
         writeMessage(GET_DATA_AVAILABLE);
         int data_size = Integer.parseInt(readMessage());
-        String name,id,type, size;
+        String name,id,type;
+        long size;
         for(int i=0;i<data_size;i++){
             name = readMessage();
             writeMessage(OK);
             id = readMessage();
             writeMessage(OK);
-            type = readMessage();
-            writeMessage(OK);
-            size = readMessage();
-            mFile = new MFile("unknow",name, id,type,size);
+            size = Long.parseLong(readMessage());
+            mFile = new MFile("unknow",name, id,size);
             files_available.add(mFile);
             writeMessage(OK);
         }
@@ -133,6 +134,7 @@ public class cliente_test {
               try {
                   ois = new ObjectInputStream(clientSocket.getInputStream());
                   buffer= (byte[]) ois.readObject();
+
               } catch (IOException ex) {
                   Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
               } catch (ClassNotFoundException ex) {

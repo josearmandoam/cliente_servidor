@@ -137,9 +137,7 @@ public class servidor_test {
             clientReceivedMessage();
             writeMessage(files_available.get(i).getId());
             clientReceivedMessage();
-            writeMessage(files_available.get(i).getType());
-            clientReceivedMessage();
-            writeMessage(files_available.get(i).getSize());
+            writeMessage(Long.toString(files_available.get(i).getSize()));
             clientReceivedMessage();
         }
         if(clientReceivedMessage())
@@ -217,39 +215,10 @@ public class servidor_test {
         File carpeta = new File(SOURCE_PATH);
         files_available = new Vector();
         for(File fichero : carpeta.listFiles()){
-            mFile = new MFile(fichero.getAbsolutePath(),fichero.getName(),getFileExtension(fichero), getFileSize(fichero));
+            mFile = new MFile(fichero.getAbsolutePath(),fichero.getName(), fichero.length());
             files_available.add(mFile);
         }
     }
-
-    private String getFileSize(File fichero) {
-        //
-        String fSize = "0B";
-        long size = fichero.length();
-        fSize = fichero.length() + "KB";
-        if(size > 1024){// pasamos B a KB
-            size = (size / 1024);
-            fSize =  size + "KB";
-        }
-        
-        if(size > 1024){ //pasamos KB a MB
-            size = (size/1024);
-            fSize =  size + "MB";
-        }
-        
-        if(size > 1024){ //pasamos MB a GB
-            size = (size/1024);
-            fSize =  size + "GB";
-        }
-        
-        return fSize;
-    }
-    
-    private String getFileExtension(File fichero) {
-        String extesion = fichero.getName().substring(fichero.getName().indexOf(".")+1,fichero.getName().length());
-        return extesion;
-    }
-    
 }
 
 

@@ -5,6 +5,7 @@
  */
 package paquete;
 
+import java.io.File;
 import java.util.UUID;
 
 /**
@@ -15,8 +16,7 @@ public class MFile {
     private String path;
     private String name;
     private String id;
-    private String type;
-    private String size;
+    private long size;
     public MFile(String path, String name){
         this.path = path;
         this.name = name;
@@ -29,19 +29,17 @@ public class MFile {
         this.id = id;
     }
     
-    public MFile(String path, String name, String type, String size){
+    public MFile(String path, String name, long size){
         this.path = path;
         this.name = name;
         this.id = generateId();
-        this.type = type;
         this.size = size;
     }
     
-    public MFile(String path, String name, String id, String type, String size){
+    public MFile(String path, String name, String id, long size){
         this.path = path;
         this.name = name;
         this.id = id;
-        this.type = type;
         this.size = size;
     }
 
@@ -70,26 +68,42 @@ public class MFile {
         return id;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(String size) {
+    public void setSize(long size) {
         this.size = size;
     }
     
+    public String getFormatedSize(){
+        String fSize = "0B";
+        long size = this.size;
+        fSize = this.size + "KB";
+        if(size > 1024){// pasamos B a KB
+            size = (size / 1024);
+            fSize =  size + "KB";
+        }
+        
+        if(size > 1024){ //pasamos KB a MB
+            size = (size/1024);
+            fSize =  size + "MB";
+        }
+        
+        if(size > 1024){ //pasamos MB a GB
+            size = (size/1024);
+            fSize =  size + "GB";
+        }
+        return fSize;
+    }
     
+    public String getFileExtension(){
+        String extesion = name.substring(name.indexOf(".")+1,name.length());
+        return extesion;
+    }
     
     @Override
     public String toString(){
-        return "Archivo:\n[Path="+ path + "] [Name="+name+"] [Id="+ id+"] [Type="+type+"] [Size="+size+"]";
+        return "Archivo:\n[Path="+ path + "] [Name="+name+"] [Id="+ id+"] [Type="+getFileExtension()+"] [Size="+getFormatedSize()+"]";
     }
 }
