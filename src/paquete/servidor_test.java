@@ -50,7 +50,7 @@ public class servidor_test {
     private MFile mFile;
     byte[] buffer;
     
-    //Gstion de Imagen
+    //Gestion de Imagen
     FileInputStream fis;
     ObjectOutputStream oos;
     
@@ -63,6 +63,8 @@ public class servidor_test {
             serverSocket = new ServerSocket(port);
             do{
                 clientSocket = serverSocket.accept();
+                inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));//la linea de creacion del buffer la he puesto aqui para que no se destruya ningun mensaje
+
                 System.out.println("\nCliente conectado: " + clientSocket.getLocalAddress() + " - " + clientSocket.getPort());
                 do{
                     peticion = readMessage();
@@ -161,7 +163,6 @@ public class servidor_test {
     private String readMessage(){
         String response = "-1";
         try {
-            inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             response = inReader.readLine();
             
 //            System.out.println("Client reads: "+response);
@@ -207,7 +208,7 @@ public class servidor_test {
             };
             write.start();
             while(write.isAlive()){
-                System.out.println("Enviando archivo...");
+                //System.out.println("Enviando archivo...");
             }
             //oos.close();
     }

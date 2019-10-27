@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-//Pepe ha escrito aqui y paco tambien 
 package paquete;
 
 import java.io.BufferedReader;
@@ -60,6 +59,8 @@ public class cliente_test {
     public void startClient(){
         try {
             clientSocket = new Socket(host, port);
+            inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //la linea de creacion del buffer la he puesto aqui para que no se destruya ningun mensaje
+
             getFilesAvailable();
             getFile(1);
             endConnection();
@@ -96,10 +97,10 @@ public class cliente_test {
         
         writeMessage(OK);
         
-//        System.out.println("Cliente: \nArchivos disponibles:");
-//        for(int i=0;i<files_available.size();i++){
-//            System.out.println(files_available.get(i));
-//        }
+        System.out.println("Cliente: \nArchivos disponibles:");
+        for(int i=0;i<files_available.size();i++){
+            System.out.println(files_available.get(i));
+        }
     }
 
     private void writeMessage(String message){
@@ -117,7 +118,6 @@ public class cliente_test {
     private String readMessage(){
         String response = "-1";
         try {
-            inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             response = inReader.readLine();
 //            System.out.println("Client reads: "+response);
            
