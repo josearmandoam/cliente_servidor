@@ -44,7 +44,7 @@ public class cliente_test {
     private String host = "localhost";
     private BufferedReader inReader;
     private PrintWriter outWriter;
-    private Vector<MFile> files_available;
+    protected Vector<MFile> files_available;
     private String response;
     private MFile mFile;
     private byte[] buffer; 
@@ -61,24 +61,23 @@ public class cliente_test {
             clientSocket = new Socket(host, port);
             inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //la linea de creacion del buffer la he puesto aqui para que no se destruya ningun mensaje
 
-            getFilesAvailable();
-            getFile(1);
-            endConnection();
+//            getFilesAvailable();
+//            getFile(1);
+//            endConnection();
         } catch (IOException ex) {
             Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void getFile(int objectSelected) {
+    protected void getFile(int objectSelected) {
         //SOLICITAR DESCARGAR UN IMAGEN
         writeMessage(DOWNLOAD_FILE);
         writeMessage(files_available.get(objectSelected).getId());
         takeFile(files_available.get(objectSelected).getName());
         writeMessage(OK);
-        writeMessage(END_CONNECTION);
     }
 
-    private void getFilesAvailable(){
+    protected void getFilesAvailable(){
         writeMessage(GET_DATA_AVAILABLE);
         int data_size = Integer.parseInt(readMessage());
         String name,id,type, size;
@@ -158,7 +157,7 @@ public class cliente_test {
         write.start();
     }
     
-    private void endConnection() {
+    protected void endConnection() {
         writeMessage(END_CONNECTION);
         try{
             if(inReader!=null)

@@ -27,8 +27,13 @@ public class main {
         };
         hilo.start();
         
-        cliente_test cliente = new cliente_test();
-        cliente.startClient();
+        
+        Cliente nuevo = new Cliente();
+        nuevo.setVisible(true);
+        
+//        cliente_test cliente = new cliente_test();
+//        cliente.startClient();
+        
     }
     
 }
