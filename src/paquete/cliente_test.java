@@ -58,31 +58,32 @@ public class cliente_test {
         files_available = new Vector();
     }
     
-    public void startClient(){
+    public boolean startClient(String host, int port){
         try {
             clientSocket = new Socket(host, port);
             inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //la linea de creacion del buffer la he puesto aqui para que no se destruya ningun mensaje
-
-            getFilesAvailable();
-            getFile(1);
-            endConnection();
+            
         } catch (IOException ex) {
             Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return (clientSocket != null);
     }
 
-    protected void getFile(int objectSelected) {
+    protected boolean  getFile(int objectSelected, String path) {
         //SOLICITAR DESCARGAR UN IMAGEN
+        boolean success;
         writeMessage(DOWNLOAD_FILE);
         writeMessage(files_available.get(objectSelected).getId());
-        takeFile(files_available.get(objectSelected).getName());
+        success = takeFile(files_available.get(objectSelected).getFullName(), path);
         writeMessage(OK);
+        return success;
     }
 
     protected void getFilesAvailable(){
         writeMessage(GET_DATA_AVAILABLE);
         int data_size = Integer.parseInt(readMessage());
-        String name,id,type;
+        String name,id;
         long size;
         for(int i=0;i<data_size;i++){
             name = readMessage();
@@ -97,10 +98,10 @@ public class cliente_test {
         
         writeMessage(OK);
         
-        System.out.println("Cliente: \nArchivos disponibles:");
-        for(int i=0;i<files_available.size();i++){
-            System.out.println(files_available.get(i));
-        }
+//        System.out.println("Cliente: \nArchivos disponibles:");
+//        for(int i=0;i<files_available.size();i++){
+//            System.out.println(files_available.get(i));
+//        }
     }
 
     private void writeMessage(String message){
@@ -128,13 +129,12 @@ public class cliente_test {
         return response;
     }
     
-    private void takeFile(String name){
+    private boolean takeFile(String name, String path){
         Thread read = new Thread(){
           public void run(){
               try {
                   ois = new ObjectInputStream(clientSocket.getInputStream());
                   buffer= (byte[]) ois.readObject();
-
               } catch (IOException ex) {
                   Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
               } catch (ClassNotFoundException ex) {
@@ -147,7 +147,7 @@ public class cliente_test {
         Thread write = new Thread(){
             public void run(){
                 try {
-                    fos = new FileOutputStream(SAVE_FILES_PATH + name);
+                    fos = new FileOutputStream(path + name);
                     fos.write(buffer);
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
@@ -157,6 +157,7 @@ public class cliente_test {
             }
         };
         write.start();
+        return true;
     }
     
     protected void endConnection() {

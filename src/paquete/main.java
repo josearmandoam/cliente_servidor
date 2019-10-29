@@ -28,11 +28,11 @@ public class main {
         hilo.start();
         
         
-//        Cliente nuevo = new Cliente();
-//        nuevo.setVisible(true);
+        Cliente nuevo = new Cliente();
+        nuevo.setVisible(true);
         
-        cliente_test cliente = new cliente_test();
-        cliente.startClient();
+//        cliente_test cliente = new cliente_test();
+//        cliente.startClient();
         
     }
     

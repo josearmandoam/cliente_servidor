@@ -56,11 +56,15 @@ public class MFile {
         this.path = path;
     }
 
-    public String getName() {
+    public String getFullName() {
         return name;
     }
+    
+    public String getName(){
+        return name.substring(0,name.indexOf("."));
+    }
 
-    public void setName(String name) {
+    public void setFullName(String name) {
         this.name = name;
     }
 

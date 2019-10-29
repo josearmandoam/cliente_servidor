@@ -133,7 +133,7 @@ public class servidor_test {
     private void sendFilesAvailable(){
         writeMessage(Integer.toString(files_available.size()));
         for(int i=0;i<files_available.size();i++){
-            writeMessage(files_available.get(i).getName());
+            writeMessage(files_available.get(i).getFullName());
             clientReceivedMessage();
             writeMessage(files_available.get(i).getId());
             clientReceivedMessage();
@@ -218,6 +218,11 @@ public class servidor_test {
             mFile = new MFile(fichero.getAbsolutePath(),fichero.getName(), fichero.length());
             files_available.add(mFile);
         }
+    }
+    
+    public static void main(String[] args){
+        servidor_test server = new servidor_test();
+        server.startServer();
     }
 }
 

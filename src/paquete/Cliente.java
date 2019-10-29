@@ -5,6 +5,15 @@
  */
 package paquete;
 
+import java.awt.Color;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author jose
@@ -16,11 +25,12 @@ public class Cliente extends javax.swing.JFrame {
      */
     public Cliente() {
         initComponents();
-        jButton1.setVisible(false);
-        jButton2.setVisible(false);
-        jButton3.setVisible(false);
-        jComboBox1.setVisible(false);
+//        getFileListButton.setVisible(false);
+//        getFilesButton.setVisible(false);
+//        endConnectionButton.setVisible(false);
+//        jComboBox1.setVisible(false);
         cliente = new cliente_test();
+        getDownloadPathByDefault();
     }
 
     /**
@@ -32,130 +42,322 @@ public class Cliente extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        hostTextField = new javax.swing.JTextField();
+        searchTextField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        portTextField = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        startCliConn = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jButton4 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        filesTable = new javax.swing.JTable();
+        downloadButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        statusTextField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        downloadPathTextField = new javax.swing.JTextField();
+        editDownloadPathButton = new javax.swing.JButton();
+        openDownloadPathButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("recibir lista de ficheros");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Connect Info"));
+
+        hostTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        hostTextField.setText("localhost");
+        hostTextField.setMargin(new java.awt.Insets(2, 4, 2, 2));
+
+        searchTextField.setToolTipText("");
+
+        jLabel1.setText("Port");
+
+        portTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        portTextField.setText("29292");
+        portTextField.setMargin(new java.awt.Insets(2, 4, 2, 2));
+        portTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                portTextFieldActionPerformed(evt);
             }
         });
 
-        jButton2.setText("recibir fichero");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jLabel2.setText("Host");
+
+        startCliConn.setText("Conectar");
+        startCliConn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                startCliConnActionPerformed(evt);
             }
         });
 
-        jButton3.setText("acabar conexion");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jButton2.setText("Buscar");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(searchTextField)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(146, 146, 146)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(startCliConn, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(startCliConn, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Files Available"));
+
+        filesTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Name", "Type", "Size"
+            }
+        ));
+        filesTable.setAlignmentX(3.0F);
+        jScrollPane1.setViewportView(filesTable);
+
+        downloadButton.setText("Descargar");
+        downloadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                downloadButtonActionPerformed(evt);
             }
         });
 
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(downloadButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(downloadButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Download Info"));
+        jPanel3.setPreferredSize(new java.awt.Dimension(561, 138));
+
+        statusTextField.setEditable(false);
+        statusTextField.setMargin(new java.awt.Insets(2, 4, 2, 2));
+
+        jLabel3.setText("Estado");
+
+        jLabel4.setText("Carpeta destino");
+
+        downloadPathTextField.setEditable(false);
+        downloadPathTextField.setMargin(new java.awt.Insets(2, 4, 2, 2));
+
+        editDownloadPathButton.setText("Editar");
+        editDownloadPathButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                editDownloadPathButtonActionPerformed(evt);
             }
         });
 
-        jButton4.setText("iniciar conexion");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        openDownloadPathButton1.setText("Abrir");
+        openDownloadPathButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                openDownloadPathButton1ActionPerformed(evt);
             }
         });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(statusTextField)
+                            .addComponent(downloadPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 415, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(editDownloadPathButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(openDownloadPathButton1))
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(downloadPathTextField)
+                    .addComponent(openDownloadPathButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
+                    .addComponent(editDownloadPathButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(106, 106, 106)
-                        .addComponent(jButton4))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(94, 94, 94)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(167, Short.MAX_VALUE))
+                .addGap(25, 25, 25)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addComponent(jButton4)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addGap(17, 17, 17)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
-                .addContainerGap(139, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    
+    private void getDownloadPathByDefault(){
+        String home = System.getProperty("user.home");
+        downloadPathTextField.setText(home+"/Downloads");
+        
+//        File file = new File(home+"/Downloads/" + fileName + ".txt"); 
+    }
+    
+    private void startCliConnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startCliConnActionPerformed
         // TODO add your handling code here:
-        //boton recibir lista
-        jButton2.setVisible(true);
-        jComboBox1.removeAllItems();
-        jComboBox1.setVisible(true);
-        cliente.getFilesAvailable();
-        for(int i=0;i<cliente.files_available.size();i++){
-            jComboBox1.addItem(cliente.files_available.get(i).getName());
+        if(startCliConn.getText().equals("Desconectar")){
+            cliente.endConnection();
+            hostTextField.setEnabled(true);
+            portTextField.setEnabled(true);
+            startCliConn.setText("iniciar conexion");
+            
+            DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
+            while(model.getRowCount()>0)
+                model.removeRow(0);
+            successMessage("Desconectado");
+        }else{
+            if(cliente.startClient(hostTextField.getText(), Integer.parseInt(portTextField.getText())))
+                successConnection();
+            else
+                failureConnection();
+                startCliConn.setText("Desconectar");
+            }
+    }//GEN-LAST:event_startCliConnActionPerformed
+
+    private void portTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_portTextFieldActionPerformed
+
+    private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
+        try{
+            int row_selected = filesTable.getSelectedRow();
+            boolean res = cliente.getFile(row_selected, downloadPathTextField.getText()+"/");
+            if(res)
+                successMessage("Descargado correctamente");
+            else
+                failureMessage("Error al descargar");
+        }catch(Exception e){
+            failureMessage("Selecciona una columna");
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_downloadButtonActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void editDownloadPathButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDownloadPathButtonActionPerformed
         // TODO add your handling code here:
-        	System.out.println(jComboBox1.getSelectedItem());
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        JFileChooser fileChooser = new JFileChooser(new File(downloadPathTextField.getText()));
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int option = fileChooser.showOpenDialog(editDownloadPathButton);
+        if(option == JFileChooser.APPROVE_OPTION){
+            File file = fileChooser.getSelectedFile();
+            downloadPathTextField.setText(file.getAbsolutePath());
+        }
+    }//GEN-LAST:event_editDownloadPathButtonActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        //boton recibir fichero X
-        if(jComboBox1.getSelectedIndex()>-1)
-            cliente.getFile(jComboBox1.getSelectedIndex());
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void openDownloadPathButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDownloadPathButton1ActionPerformed
+        try {
+            // TODO add your handling code here:
+            Desktop.getDesktop().open(new File(downloadPathTextField.getText()));
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_openDownloadPathButton1ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-        //boton fin de conexion
-        cliente.endConnection();
-        jButton1.setVisible(false);
-        jButton2.setVisible(false);
-        jButton3.setVisible(false);
-        jComboBox1.setVisible(false);
-        jButton4.setVisible(true);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void failureMessage(String msg) {
+        statusTextField.setForeground(new Color(115, 3, 3));
+        statusTextField.setText(msg);
+    }
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-        cliente.startClient();
-        jButton1.setVisible(true);
-        jButton3.setVisible(true);
-        jButton4.setVisible(false);
-    }//GEN-LAST:event_jButton4ActionPerformed
-
+    private void successMessage(String msg) {
+        statusTextField.setForeground(new Color(19, 19, 19));
+        statusTextField.setText(msg);
+    }
+    
+    private void successConnection(){
+        hostTextField.setEnabled(false);
+        portTextField.setEnabled(false);
+        
+        cliente.getFilesAvailable();
+        for (int i = 0; i < cliente.files_available.size(); i++) {
+            MFile file = cliente.files_available.get(i);
+            
+            DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
+            model.addRow(new Object[]{file.getName(),file.getFileExtension(),file.getFormatedSize()});
+        }
+        successMessage("Conectado correctamente");
+    }
+    
+    private void failureConnection(){
+        failureMessage("Error al conectarse al servidor");
+    }
     /**
      * @param args the command line arguments
      */
@@ -193,11 +395,25 @@ public class Cliente extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton downloadButton;
+    private javax.swing.JTextField downloadPathTextField;
+    private javax.swing.JButton editDownloadPathButton;
+    private javax.swing.JTable filesTable;
+    private javax.swing.JTextField hostTextField;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton openDownloadPathButton1;
+    private javax.swing.JTextField portTextField;
+    private javax.swing.JTextField searchTextField;
+    private javax.swing.JButton startCliConn;
+    private javax.swing.JTextField statusTextField;
     // End of variables declaration//GEN-END:variables
     private cliente_test cliente;
 }
