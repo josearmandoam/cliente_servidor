@@ -25,6 +25,7 @@ public class Cliente extends javax.swing.JFrame {
      */
     public Cliente() {
         initComponents();
+        filesTable.setDefaultEditor(Object.class, null);
 //        getFileListButton.setVisible(false);
 //        getFilesButton.setVisible(false);
 //        endConnectionButton.setVisible(false);

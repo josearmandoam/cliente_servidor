@@ -85,6 +85,8 @@ public class cliente_test {
         int data_size = Integer.parseInt(readMessage());
         String name,id;
         long size;
+        files_available = new Vector();//si esto no esta aqui al desconectar y volver a conectar conserva los elementos de antes, quedan repetidos
+
         for(int i=0;i<data_size;i++){
             name = readMessage();
             writeMessage(OK);
