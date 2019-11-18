@@ -39,6 +39,7 @@ public class servidor_test {
     private final String END_CONNECTION = "0000";
     
     private final String SOURCE_PATH = "data/";
+    private final String ALL_FILES = "*.*";
     
     private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -47,6 +48,7 @@ public class servidor_test {
     private int port = 29292;
     private String peticion;
     private Vector<MFile> files_available;
+    private Vector<MFile> files_available_aux;
     private MFile mFile;
     byte[] buffer;
     
@@ -73,7 +75,11 @@ public class servidor_test {
                         switch (peticion) {
                             case GET_DATA_AVAILABLE:
                                 //El cliente solicita los archivos del servidor
-                                sendFilesAvailable();
+                                String cadena = readMessage();
+                                if(cadena.equals(ALL_FILES))
+                                    sendFilesAvailable();
+                                else
+                                    sendFilesAvailebleByString(cadena);
                                 break;
                             case DOWNLOAD_FILE:
                                 //Se envia el fichero que se solicita
@@ -146,6 +152,24 @@ public class servidor_test {
             System.out.println("Server: Error al enviar los archivos disponibles");
     }
     
+    private void sendFilesAvailebleByString(String cadena){
+        readFilesAvailableByString(cadena);
+        writeMessage(Integer.toString(files_available_aux.size()));
+        for(int i=0;i<files_available_aux.size();i++){
+            writeMessage(files_available_aux.get(i).getFullName());
+            clientReceivedMessage();
+            writeMessage(files_available_aux.get(i).getId());
+            clientReceivedMessage();
+            writeMessage(Long.toString(files_available_aux.get(i).getSize()));
+            clientReceivedMessage();
+        }
+        if(clientReceivedMessage())
+            System.out.println("Server: Archivos enviados correctamente");
+        else
+            System.out.println("Server: Error al enviar los archivos disponibles");
+    }
+    
+    
     private void writeMessage(String message){
         try {
             outWriter = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -217,6 +241,19 @@ public class servidor_test {
         for(File fichero : carpeta.listFiles()){
             mFile = new MFile(fichero.getAbsolutePath(),fichero.getName(), fichero.length());
             files_available.add(mFile);
+        }
+    }
+    
+    private void readFilesAvailableByString(String cadena){
+        if(files_available_aux==null)
+            files_available_aux = new Vector();
+        else
+            files_available_aux.clear();
+        
+        for(MFile file : files_available){
+            if(file.getFullName().toUpperCase().contains(cadena.toUpperCase())){
+                files_available_aux.add(file);
+            }
         }
     }
     

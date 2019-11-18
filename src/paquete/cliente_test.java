@@ -54,9 +54,7 @@ public class cliente_test {
     ObjectInputStream ois;
     FileOutputStream fos;
     
-    public cliente_test(){
-        files_available = new Vector();
-    }
+    public cliente_test(){}
     
     public boolean startClient(String host, int port){
         try {
@@ -85,8 +83,43 @@ public class cliente_test {
         int data_size = Integer.parseInt(readMessage());
         String name,id;
         long size;
-        files_available = new Vector();//si esto no esta aqui al desconectar y volver a conectar conserva los elementos de antes, quedan repetidos
-
+        
+        if(files_available==null)
+            files_available = new Vector();//si esto no esta aqui al desconectar y volver a conectar conserva los elementos de antes, quedan repetidos
+        else
+            files_available.clear();
+        
+        for(int i=0;i<data_size;i++){
+            name = readMessage();
+            writeMessage(OK);
+            id = readMessage();
+            writeMessage(OK);
+            size = Long.parseLong(readMessage());
+            mFile = new MFile("unknow",name, id,size);
+            files_available.add(mFile);
+            writeMessage(OK);
+        }
+        
+        writeMessage(OK);
+        
+//        System.out.println("Cliente: \nArchivos disponibles:");
+//        for(int i=0;i<files_available.size();i++){
+//            System.out.println(files_available.get(i));
+//        }
+    }
+    protected void getFilesAvailableByString(String cadena){
+        writeMessage(GET_DATA_AVAILABLE);
+        writeMessage(cadena);
+        int data_size = Integer.parseInt(readMessage());
+        String name,id;
+        long size;
+        
+        
+        if(files_available == null)
+            files_available = new Vector();//si esto no esta aqui al desconectar y volver a conectar conserva los elementos de antes, quedan repetidos
+        else
+            files_available.clear();
+        
         for(int i=0;i<data_size;i++){
             name = readMessage();
             writeMessage(OK);

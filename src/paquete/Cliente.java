@@ -26,6 +26,8 @@ public class Cliente extends javax.swing.JFrame {
     public Cliente() {
         initComponents();
         filesTable.setDefaultEditor(Object.class, null);
+        searchTextField.setEnabled(false);
+        searchJButton.setEnabled(false);
 //        getFileListButton.setVisible(false);
 //        getFilesButton.setVisible(false);
 //        endConnectionButton.setVisible(false);
@@ -50,7 +52,8 @@ public class Cliente extends javax.swing.JFrame {
         portTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         startCliConn = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        searchJButton = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         filesTable = new javax.swing.JTable();
@@ -69,14 +72,16 @@ public class Cliente extends javax.swing.JFrame {
 
         hostTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         hostTextField.setText("localhost");
+        hostTextField.setToolTipText("Host de conexion");
         hostTextField.setMargin(new java.awt.Insets(2, 4, 2, 2));
 
-        searchTextField.setToolTipText("");
+        searchTextField.setToolTipText("Texto de busqueda");
 
-        jLabel1.setText("Port");
+        jLabel1.setText("Puerto");
 
         portTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         portTextField.setText("29292");
+        portTextField.setToolTipText("Puerto de conexión");
         portTextField.setMargin(new java.awt.Insets(2, 4, 2, 2));
         portTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -93,7 +98,14 @@ public class Cliente extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("Buscar");
+        searchJButton.setText("Buscar");
+        searchJButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchJButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Busqueda");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -101,38 +113,43 @@ public class Cliente extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(searchTextField)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(190, 190, 190)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel1))))
                         .addGap(18, 18, 18)
-                        .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(146, 146, 146)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(startCliConn, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(startCliConn, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                            .addComponent(searchJButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jLabel5))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(startCliConn, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(startCliConn, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hostTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(searchJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -237,7 +254,7 @@ public class Cliente extends javax.swing.JFrame {
                     .addComponent(downloadPathTextField)
                     .addComponent(openDownloadPathButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
                     .addComponent(editDownloadPathButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -246,21 +263,22 @@ public class Cliente extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE))
-                .addContainerGap(27, Short.MAX_VALUE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(17, 17, 17)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -281,10 +299,7 @@ public class Cliente extends javax.swing.JFrame {
             hostTextField.setEnabled(true);
             portTextField.setEnabled(true);
             startCliConn.setText("iniciar conexion");
-            
-            DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
-            while(model.getRowCount()>0)
-                model.removeRow(0);
+            cleanTable();
             successMessage("Desconectado");
         }else{
             if(cliente.startClient(hostTextField.getText(), Integer.parseInt(portTextField.getText())))
@@ -294,6 +309,12 @@ public class Cliente extends javax.swing.JFrame {
                 startCliConn.setText("Desconectar");
             }
     }//GEN-LAST:event_startCliConnActionPerformed
+
+    private void cleanTable() {
+        DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
+        while(model.getRowCount()>0)
+            model.removeRow(0);
+    }
 
     private void portTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portTextFieldActionPerformed
         // TODO add your handling code here:
@@ -332,9 +353,27 @@ public class Cliente extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_openDownloadPathButton1ActionPerformed
 
+    private void searchJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchJButtonActionPerformed
+       if(searchTextField.getText().isEmpty()){
+           failureMessage("Introduzca que archivos desea buscar");
+       }else{
+            cleanTable();
+            cliente.getFilesAvailableByString(searchTextField.getText());
+        
+            for (int i = 0; i < cliente.files_available.size(); i++) {
+            MFile file = cliente.files_available.get(i);
+            
+            DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
+            model.addRow(new Object[]{file.getName(),file.getFileExtension(),file.getFormatedSize()});
+        }
+       }
+    }//GEN-LAST:event_searchJButtonActionPerformed
+
     private void failureMessage(String msg) {
         statusTextField.setForeground(new Color(115, 3, 3));
         statusTextField.setText(msg);
+        searchTextField.setEnabled(false);
+        searchJButton.setEnabled(false);
     }
 
     private void successMessage(String msg) {
@@ -345,14 +384,15 @@ public class Cliente extends javax.swing.JFrame {
     private void successConnection(){
         hostTextField.setEnabled(false);
         portTextField.setEnabled(false);
-        
-        cliente.getFilesAvailable();
-        for (int i = 0; i < cliente.files_available.size(); i++) {
-            MFile file = cliente.files_available.get(i);
-            
-            DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
-            model.addRow(new Object[]{file.getName(),file.getFileExtension(),file.getFormatedSize()});
-        }
+        searchTextField.setEnabled(true);
+        searchJButton.setEnabled(true);
+//        cliente.getFilesAvailable();
+//        for (int i = 0; i < cliente.files_available.size(); i++) {
+//            MFile file = cliente.files_available.get(i);
+//            
+//            DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
+//            model.addRow(new Object[]{file.getName(),file.getFileExtension(),file.getFormatedSize()});
+//        }
         successMessage("Conectado correctamente");
     }
     
@@ -401,17 +441,18 @@ public class Cliente extends javax.swing.JFrame {
     private javax.swing.JButton editDownloadPathButton;
     private javax.swing.JTable filesTable;
     private javax.swing.JTextField hostTextField;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton openDownloadPathButton1;
     private javax.swing.JTextField portTextField;
+    private javax.swing.JButton searchJButton;
     private javax.swing.JTextField searchTextField;
     private javax.swing.JButton startCliConn;
     private javax.swing.JTextField statusTextField;
