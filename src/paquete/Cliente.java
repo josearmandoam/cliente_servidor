@@ -359,9 +359,9 @@ public class Cliente extends javax.swing.JFrame {
        }else{
             cleanTable();
             cliente.getFilesAvailableByString(searchTextField.getText());
-        
+            successMessage("Archivos encontrados: "+cliente.files_available.size());
             for (int i = 0; i < cliente.files_available.size(); i++) {
-            MFile file = cliente.files_available.get(i);
+                MFile file = cliente.files_available.get(i);
             
             DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
             model.addRow(new Object[]{file.getName(),file.getFileExtension(),file.getFormatedSize()});
@@ -372,8 +372,6 @@ public class Cliente extends javax.swing.JFrame {
     private void failureMessage(String msg) {
         statusTextField.setForeground(new Color(115, 3, 3));
         statusTextField.setText(msg);
-        searchTextField.setEnabled(false);
-        searchJButton.setEnabled(false);
     }
 
     private void successMessage(String msg) {
@@ -398,6 +396,8 @@ public class Cliente extends javax.swing.JFrame {
     
     private void failureConnection(){
         failureMessage("Error al conectarse al servidor");
+        searchTextField.setEnabled(false);
+        searchJButton.setEnabled(false);
     }
     /**
      * @param args the command line arguments
