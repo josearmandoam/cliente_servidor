@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -28,6 +30,8 @@ public class Cliente extends javax.swing.JFrame {
         filesTable.setDefaultEditor(Object.class, null);
         searchTextField.setEnabled(false);
         searchJButton.setEnabled(false);
+        downloadButton.setEnabled(false);
+        statusTextField.setText("Desconectado");
 //        getFileListButton.setVisible(false);
 //        getFilesButton.setVisible(false);
 //        endConnectionButton.setVisible(false);
@@ -67,6 +71,7 @@ public class Cliente extends javax.swing.JFrame {
         openDownloadPathButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Descaga tus archivos");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Connect Info"));
 
@@ -265,9 +270,8 @@ public class Cliente extends javax.swing.JFrame {
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -298,7 +302,10 @@ public class Cliente extends javax.swing.JFrame {
             cliente.endConnection();
             hostTextField.setEnabled(true);
             portTextField.setEnabled(true);
+            searchJButton.setEnabled(false);
+            searchTextField.setEnabled(false);
             startCliConn.setText("iniciar conexion");
+            downloadButton.setEnabled(false);
             cleanTable();
             successMessage("Desconectado");
         }else{
@@ -314,6 +321,7 @@ public class Cliente extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
         while(model.getRowCount()>0)
             model.removeRow(0);
+        downloadButton.setEnabled(false);
     }
 
     private void portTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portTextFieldActionPerformed
@@ -321,16 +329,9 @@ public class Cliente extends javax.swing.JFrame {
     }//GEN-LAST:event_portTextFieldActionPerformed
 
     private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
-        try{
-            int row_selected = filesTable.getSelectedRow();
-            boolean res = cliente.getFile(row_selected, downloadPathTextField.getText()+"/");
-            if(res)
-                successMessage("Descargado correctamente");
-            else
-                failureMessage("Error al descargar");
-        }catch(Exception e){
-            failureMessage("Selecciona una columna");
-        }
+        int row_selected = filesTable.getSelectedRow();
+        cliente.downloadFile(row_selected, downloadPathTextField.getText()+"/");
+        successMessage("Descargado correctamente");
     }//GEN-LAST:event_downloadButtonActionPerformed
 
     private void editDownloadPathButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDownloadPathButtonActionPerformed
@@ -356,15 +357,17 @@ public class Cliente extends javax.swing.JFrame {
     private void searchJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchJButtonActionPerformed
        if(searchTextField.getText().isEmpty()){
            failureMessage("Introduzca que archivos desea buscar");
+           downloadButton.setEnabled(false);
        }else{
             cleanTable();
-            cliente.getFilesAvailableByString(searchTextField.getText());
+            cliente.searchFileBy(searchTextField.getText());
             successMessage("Archivos encontrados: "+cliente.files_available.size());
             for (int i = 0; i < cliente.files_available.size(); i++) {
                 MFile file = cliente.files_available.get(i);
             
             DefaultTableModel model = (DefaultTableModel) filesTable.getModel();
             model.addRow(new Object[]{file.getName(),file.getFileExtension(),file.getFormatedSize()});
+            downloadButton.setEnabled(true);
         }
        }
     }//GEN-LAST:event_searchJButtonActionPerformed

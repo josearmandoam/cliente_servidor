@@ -22,22 +22,14 @@ import java.util.logging.Logger;
  * @author jose
  */
 public class cliente_test {
-    private final String SERVER_LISTENING = "000";
-    private final String CLIENT_OPERATIVE = "001";
-    private final String OK = "010";
-    private final String NOT_OK = "100";
-    
-    private final String IMAGES_DATA = "002";
-    private final String DATA_SIZE = "020";
-    private final String END_DATA =  "200";
     private final String DOWNLOAD_FILE = "222";
     
     //PETICIONES
-    private final String GET_DATA_AVAILABLE = "0001";
+    private final String GET_FILE = "0001";
+    private final String SEND_FILE_SIZE = "0002";
+    private final String SEND_FILE_DATA = "0003";
+        
     private final String END_CONNECTION = "0000";
-    private final String DIE_SERVER = "111111111111111111111";
-    private final String SAVE_FILES_PATH = "img/";
-    
     
     private Socket clientSocket;
     private int port = 29292;
@@ -45,22 +37,26 @@ public class cliente_test {
     private BufferedReader inReader;
     private PrintWriter outWriter;
     protected Vector<MFile> files_available;
-    private String response;
     private MFile mFile;
     private byte[] buffer; 
-    private long fileSize;
-    
+    private Vector<String> v_aux;
+    private Vector<String> msg_data;
+    private String msg_code;
+    private String msg_size;
     //Gestion Imagen
     ObjectInputStream ois;
     FileOutputStream fos;
     
-    public cliente_test(){}
+    public cliente_test(){
+        
+    }
     
     public boolean startClient(String host, int port){
         try {
             clientSocket = new Socket(host, port);
             inReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //la linea de creacion del buffer la he puesto aqui para que no se destruya ningun mensaje
-            
+            v_aux = new Vector();
+            msg_data = new Vector();
         } catch (IOException ex) {
             Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -68,53 +64,37 @@ public class cliente_test {
         return (clientSocket != null);
     }
 
-    protected boolean  getFile(int objectSelected, String path) {
+    protected void downloadFile(int objectSelected, String path) {
         //SOLICITAR DESCARGAR UN IMAGEN
-        boolean success;
-        writeMessage(DOWNLOAD_FILE);
-        writeMessage(files_available.get(objectSelected).getId());
-        success = takeFile(files_available.get(objectSelected).getFullName(), path);
-        writeMessage(OK);
-        return success;
+        v_aux.clear();
+        v_aux.add(files_available.get(objectSelected).getId());
+        buildMessage(DOWNLOAD_FILE, v_aux, 1);
+        takeFile(files_available.get(objectSelected).getFullName(), path);
+        v_aux.clear();
+        v_aux.add("ACK");
+        buildMessage(DOWNLOAD_FILE,v_aux,1);
+    }
+    
+    private void buildMessage(String code, Vector<String> args, int num_items){
+        //Todos los mensajes son del tipo cod#items_size#arg1#arg2...
+        String msg = code+"#"+num_items;
+        for (int i = 0; i < num_items; i++) {
+            msg += "#"+args.get(i);
+        }
+        msg +="#";
+        writeMessage(msg);
     }
 
-    protected void getFilesAvailable(){
-        writeMessage(GET_DATA_AVAILABLE);
-        int data_size = Integer.parseInt(readMessage());
+    protected void searchFileBy(String cadena){
+        v_aux.clear();
+        v_aux.add(cadena);
+        buildMessage(GET_FILE, v_aux, 1);
+        readMessage();
+        int data_size = 0;
+        if(msg_code.equals(SEND_FILE_SIZE))
+            data_size = Integer.parseInt(msg_data.get(0));
         String name,id;
         long size;
-        
-        if(files_available==null)
-            files_available = new Vector();//si esto no esta aqui al desconectar y volver a conectar conserva los elementos de antes, quedan repetidos
-        else
-            files_available.clear();
-        
-        for(int i=0;i<data_size;i++){
-            name = readMessage();
-            writeMessage(OK);
-            id = readMessage();
-            writeMessage(OK);
-            size = Long.parseLong(readMessage());
-            mFile = new MFile("unknow",name, id,size);
-            files_available.add(mFile);
-            writeMessage(OK);
-        }
-        
-        writeMessage(OK);
-        
-//        System.out.println("Cliente: \nArchivos disponibles:");
-//        for(int i=0;i<files_available.size();i++){
-//            System.out.println(files_available.get(i));
-//        }
-    }
-    protected void getFilesAvailableByString(String cadena){
-        writeMessage(GET_DATA_AVAILABLE);
-        writeMessage(cadena);
-        int data_size = Integer.parseInt(readMessage());
-        String fileInfo, name,id;
-        String[] splitedFileInfo;
-        long size;
-        
         
         if(files_available == null)
             files_available = new Vector();//si esto no esta aqui al desconectar y volver a conectar conserva los elementos de antes, quedan repetidos
@@ -122,82 +102,59 @@ public class cliente_test {
             files_available.clear();
         
         for(int i=0;i<data_size;i++){
-            fileInfo = readMessage();
-            splitedFileInfo = fileInfo.split("#");
-            name = splitedFileInfo[0];
-            id = splitedFileInfo[1];
-            size = Long.parseLong(splitedFileInfo[2]);
-            mFile = new MFile("unknow",name, id,size);
-            files_available.add(mFile);
-            writeMessage(OK);
+            readMessage();
+            if(msg_code.equals(SEND_FILE_DATA)){
+                name = msg_data.get(0);
+                id = msg_data.get(1);
+                size = Long.parseLong(msg_data.get(2));
+                mFile = new MFile("unknow",name, id,size);
+                files_available.add(mFile);
+            }
         }
-        
-        writeMessage(OK);
-        
-//        System.out.println("Cliente: \nArchivos disponibles:");
-//        for(int i=0;i<files_available.size();i++){
-//            System.out.println(files_available.get(i));
-//        }
     }
 
     private void writeMessage(String message){
         try {
             outWriter = new PrintWriter(clientSocket.getOutputStream(),true);
             outWriter.println(message);
-           
-//            System.out.println("Client write: "+message);
-            //outWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     private String readMessage(){
-        String response = "-1";
+       String response = "-1";
         try {
             response = inReader.readLine();
-//            System.out.println("Client reads: "+response);
-           
-            //inReader.close();
+            msg_code = "";
+            msg_size = "";
+            msg_data.clear();
+            structMessageReceived(response);
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
         }
         return response;
     }
     
-    private boolean takeFile(String name, String path){
-        Thread read = new Thread(){
-          public void run(){
-              try {
-                  ois = new ObjectInputStream(clientSocket.getInputStream());
-                  buffer= (byte[]) ois.readObject();
-              } catch (IOException ex) {
-                  Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
-              } catch (ClassNotFoundException ex) {
-                  Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
-              }
-          }  
-        };
-        read.start();
-        while(read.isAlive()){}
-        Thread write = new Thread(){
-            public void run(){
-                try {
-                    fos = new FileOutputStream(path + name);
-                    fos.write(buffer);
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        };
-        write.start();
-        return true;
+    private void takeFile(String name, String path){
+        try{
+            ois = new ObjectInputStream(clientSocket.getInputStream());
+            Object o = ois.readObject();
+            if(o instanceof byte[])
+                buffer= (byte[])o;
+            fos = new FileOutputStream(path + name);
+            fos.write(buffer);
+        } catch (IOException ex) {
+            Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(cliente_test.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     protected void endConnection() {
-        writeMessage(END_CONNECTION);
+        v_aux.clear();
+        v_aux.add("END_CONNECTION");
+        buildMessage(END_CONNECTION, v_aux, 1);
         try{
             if(inReader!=null)
                 inReader.close();
@@ -209,5 +166,16 @@ public class cliente_test {
                 clientSocket.close();
         }catch(IOException e){}
         clientSocket = null;
+    }
+    
+    private void structMessageReceived(String msg){
+        msg_code = msg.substring(0,msg.indexOf("#"));
+        msg = msg.substring(msg.indexOf("#")+1,msg.length());
+        msg_size = msg.substring(0,msg.indexOf("#"));
+        msg = msg.substring(msg.indexOf("#")+1,msg.length());
+        for (int i = 0; i < Integer.parseInt(msg_size); i++) {
+            msg_data.add(msg.substring(0,msg.indexOf("#")));
+            msg = msg.substring(msg.indexOf("#")+1,msg.length());
+        }
     }
 }

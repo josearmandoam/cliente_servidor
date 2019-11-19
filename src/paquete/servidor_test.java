@@ -24,18 +24,13 @@ import java.util.logging.Logger;
  * @author jose
  */
 public class servidor_test {
-    private final String SERVER_LISTENING = "000";
-    private final String CLIENT_OPERATIVE = "001";
-    private final String OK = "010";
-    private final String NOT_OK = "100";
-    
-    private final String IMAGES_DATA = "002";
-    private final String DATA_SIZE = "020";
-    private final String END_DATA =  "200";
     private final String DOWNLOAD_FILE = "222";
     
     //PETICIONES
-    private final String GET_DATA_AVAILABLE = "0001";
+    private final String GET_FILE = "0001";
+    private final String SEND_FILE_SIZE = "0002";
+    private final String SEND_FILE_DATA = "0003";
+    
     private final String END_CONNECTION = "0000";
     
     private final String SOURCE_PATH = "data/";
@@ -46,9 +41,13 @@ public class servidor_test {
     private PrintWriter outWriter;
     private BufferedReader inReader;
     private int port = 29292;
-    private String peticion;
     private Vector<MFile> files_available;
     private Vector<MFile> files_available_aux;
+    
+    private Vector<String> v_aux;
+    private Vector<String> msg_data;
+    private String msg_code;
+    private String msg_size;
     private MFile mFile;
     byte[] buffer;
     
@@ -58,6 +57,8 @@ public class servidor_test {
     
     public servidor_test(){
         readFilesAvailable();
+        msg_data = new Vector();
+        v_aux = new Vector();
     }
     
     public void startServer(){
@@ -69,17 +70,13 @@ public class servidor_test {
 
                 System.out.println("\nCliente conectado: " + clientSocket.getLocalAddress() + " - " + clientSocket.getPort());
                 do{
-                    peticion = readMessage();
-                    //inReader.close();
-                    if(peticion != "-1")
-                        switch (peticion) {
-                            case GET_DATA_AVAILABLE:
-                                //El cliente solicita los archivos del servidor
-                                String cadena = readMessage();
-                                if(cadena.equals(ALL_FILES))
-                                    sendFilesAvailable();
+                    readMessage();
+                        switch (msg_code) {
+                            case GET_FILE:
+                                if(msg_data.get(0).equals(ALL_FILES))
+                                    sendAllFiles();
                                 else
-                                    sendFilesAvailebleByString(cadena);
+                                    sendFileBy(msg_data.get(0));
                                 break;
                             case DOWNLOAD_FILE:
                                 //Se envia el fichero que se solicita
@@ -99,6 +96,27 @@ public class servidor_test {
         }
     }
 
+    private void buildMessage(String code, Vector<String> args, int num_items){
+        //Todos los mensajes son del tipo cod#items_size#arg1#arg2...
+        String msg = code+"#"+num_items;
+        for (int i = 0; i < num_items; i++) {
+            msg += "#"+args.get(i);
+        }
+        msg +="#";
+        writeMessage(msg);
+    }
+    
+    private void structMessageReceived(String msg){
+        msg_code = msg.substring(0,msg.indexOf("#"));
+        msg = msg.substring(msg.indexOf("#")+1,msg.length());
+        msg_size = msg.substring(0,msg.indexOf("#"));
+        msg = msg.substring(msg.indexOf("#")+1,msg.length());
+        for (int i = 0; i < Integer.parseInt(msg_size); i++) {
+            msg_data.add(msg.substring(0,msg.indexOf("#")));
+            msg = msg.substring(msg.indexOf("#")+1,msg.length());
+        }
+    }
+    
     private void endClientConnection() {
         try{
             if(inReader!=null)
@@ -114,62 +132,54 @@ public class servidor_test {
     }
 
     private void sendFile() {
-        //El cliente solicita descargar una imagen
-        String id_file = readMessage();
+        //El cliente solicita descargar un archivo
+        String id_file = msg_data.get(0);
         for(MFile file:files_available){
             if(file.getId().equals(id_file))
                 mFile = file;
         }
         if(mFile != null){
             proccessFile(mFile.getPath());
-            if(!clientReceivedMessage())
-                System.out.println("ERROR AL ENVIAR EL ARCHIVO");
-            else{
+            readMessage();
+            if(msg_code.equals(DOWNLOAD_FILE) && msg_data.get(0).equals("ACK"))
                 System.out.println("ARCHIVO ENVIADO CORRECTAMENTE");
-                writeMessage(SERVER_LISTENING);
+            else{
+                System.out.println("ERROR AL ENVIAR EL ARCHIVO");
             }
         }
     }
     
-    private void sendFilesAvailable(){
-        String message = new String();
-        writeMessage(Integer.toString(files_available.size()));
+    private void sendAllFiles(){
+        v_aux.clear();
+        v_aux.add(Long.toString(files_available.size()));
+        buildMessage(SEND_FILE_SIZE, v_aux, 1);
         for(int i=0;i<files_available.size();i++){
-            message+=files_available.get(i).getFullName()+"#"+files_available.get(i).getId()+"#"+Long.toString(files_available.get(i).getSize());
-            writeMessage(message);
-            clientReceivedMessage();
-            message="";
+            v_aux.clear();
+            v_aux.add(files_available.get(i).getFullName());
+            v_aux.add(files_available.get(i).getId());
+            v_aux.add(Long.toString(files_available.get(i).getSize()));
+            buildMessage(SEND_FILE_DATA, v_aux, 3);
         }
-        if(clientReceivedMessage())
-            System.out.println("Server: Archivos enviados correctamente");
-        else
-            System.out.println("Server: Error al enviar los archivos disponibles");
     }
     
-    private void sendFilesAvailebleByString(String cadena){
-        String message = new String();
+    private void sendFileBy(String cadena){
         readFilesAvailableByString(cadena);
-        writeMessage(Integer.toString(files_available_aux.size()));
+        v_aux.clear();
+        v_aux.add(Long.toString(files_available_aux.size()));
+        buildMessage(SEND_FILE_SIZE, v_aux, 1);
         for(int i=0;i<files_available_aux.size();i++){
-            message+=files_available_aux.get(i).getFullName()+"#"+files_available_aux.get(i).getId()+"#"+Long.toString(files_available_aux.get(i).getSize());
-            writeMessage(message);
-            clientReceivedMessage();
-            message="";
+            v_aux.clear();
+            v_aux.add(files_available_aux.get(i).getFullName());
+            v_aux.add(files_available_aux.get(i).getId());
+            v_aux.add(Long.toString(files_available_aux.get(i).getSize()));
+            buildMessage(SEND_FILE_DATA, v_aux, 3);
         }
-        if(clientReceivedMessage())
-            System.out.println("Server: Archivos enviados correctamente");
-        else
-            System.out.println("Server: Error al enviar los archivos disponibles");
     }
-    
     
     private void writeMessage(String message){
         try {
             outWriter = new PrintWriter(clientSocket.getOutputStream(), true);
             outWriter.println(message);
-            
-//            System.out.println("Client write: "+message);
-            //outWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -179,53 +189,28 @@ public class servidor_test {
         String response = "-1";
         try {
             response = inReader.readLine();
-            
-//            System.out.println("Client reads: "+response);
-            //inReader.close();
+            msg_code = "";
+            msg_size = "";
+            msg_data.clear();
+            structMessageReceived(response);
         } catch (IOException ex) {
             Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
         }
         return response;
     }
     
-    private boolean clientReceivedMessage(){
-        return (readMessage().equals(OK));
-    }
-
     private void proccessFile(String path){
-        
-            Thread read = new Thread(){
-                public void run(){
-                    try {
-                        fis = new FileInputStream(path);
-                        buffer = new byte[fis.available()];
-                        fis.read(buffer);
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
-                        Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            };
-            read.start();
-            while(read.isAlive()){};
-            Thread write = new Thread(){
-                public void run(){
-                    try {
-                        oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                        oos.writeObject(buffer);
-                        
-//                        System.out.println(oos)
-                    } catch (IOException ex) {
-                        Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            };
-            write.start();
-            while(write.isAlive()){
-                //System.out.println("Enviando archivo...");
-            }
-            //oos.close();
+        try {
+            fis = new FileInputStream(path);
+            buffer = new byte[fis.available()];
+            fis.read(buffer);
+            oos = new ObjectOutputStream(clientSocket.getOutputStream());
+            oos.writeObject(buffer);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(servidor_test.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void readFilesAvailable(){
