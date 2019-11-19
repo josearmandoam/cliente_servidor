@@ -111,7 +111,8 @@ public class cliente_test {
         writeMessage(GET_DATA_AVAILABLE);
         writeMessage(cadena);
         int data_size = Integer.parseInt(readMessage());
-        String name,id;
+        String fileInfo, name,id;
+        String[] splitedFileInfo;
         long size;
         
         
@@ -121,11 +122,11 @@ public class cliente_test {
             files_available.clear();
         
         for(int i=0;i<data_size;i++){
-            name = readMessage();
-            writeMessage(OK);
-            id = readMessage();
-            writeMessage(OK);
-            size = Long.parseLong(readMessage());
+            fileInfo = readMessage();
+            splitedFileInfo = fileInfo.split("#");
+            name = splitedFileInfo[0];
+            id = splitedFileInfo[1];
+            size = Long.parseLong(splitedFileInfo[2]);
             mFile = new MFile("unknow",name, id,size);
             files_available.add(mFile);
             writeMessage(OK);

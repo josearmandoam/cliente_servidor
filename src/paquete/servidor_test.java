@@ -85,11 +85,6 @@ public class servidor_test {
                                 //Se envia el fichero que se solicita
                                 sendFile();
                                 break;
-
-                            //case 333:
-                                //datos de la imagen que se va a descargar
-                            //    break;
-
                             case END_CONNECTION:
                                 //El cliente solicita desconectarse del servidor
                                 endClientConnection();
@@ -137,14 +132,13 @@ public class servidor_test {
     }
     
     private void sendFilesAvailable(){
+        String message = new String();
         writeMessage(Integer.toString(files_available.size()));
         for(int i=0;i<files_available.size();i++){
-            writeMessage(files_available.get(i).getFullName());
+            message+=files_available.get(i).getFullName()+"#"+files_available.get(i).getId()+"#"+Long.toString(files_available.get(i).getSize());
+            writeMessage(message);
             clientReceivedMessage();
-            writeMessage(files_available.get(i).getId());
-            clientReceivedMessage();
-            writeMessage(Long.toString(files_available.get(i).getSize()));
-            clientReceivedMessage();
+            message="";
         }
         if(clientReceivedMessage())
             System.out.println("Server: Archivos enviados correctamente");
@@ -153,15 +147,14 @@ public class servidor_test {
     }
     
     private void sendFilesAvailebleByString(String cadena){
+        String message = new String();
         readFilesAvailableByString(cadena);
         writeMessage(Integer.toString(files_available_aux.size()));
         for(int i=0;i<files_available_aux.size();i++){
-            writeMessage(files_available_aux.get(i).getFullName());
+            message+=files_available_aux.get(i).getFullName()+"#"+files_available_aux.get(i).getId()+"#"+Long.toString(files_available_aux.get(i).getSize());
+            writeMessage(message);
             clientReceivedMessage();
-            writeMessage(files_available_aux.get(i).getId());
-            clientReceivedMessage();
-            writeMessage(Long.toString(files_available_aux.get(i).getSize()));
-            clientReceivedMessage();
+            message="";
         }
         if(clientReceivedMessage())
             System.out.println("Server: Archivos enviados correctamente");
